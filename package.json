@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js",
     "initdir": "npx mkdirp src/routes src/controllers src/models src/config src/middlewares src/validations src/utils src/database/migration src/database/seeder"
   },
   "keywords": [],
@@ -18,10 +19,12 @@
     "jsonwebtoken": "^9.0.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.3.0",
-    "sequelize": "^6.31.1"
+    "sequelize": "^6.31.1",
+    "sequelize-cli": "^6.6.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
-    "mkdirp": "^3.0.1"
+    "mkdirp": "^3.0.1",
+    "nodemon": "^2.0.22"
   }
 }
