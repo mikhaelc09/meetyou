@@ -1,6 +1,6 @@
 const env = require('./env.config.js');
 
-export default {
+module.exports = {
   development: {
     username: env('DB_USER'),
     password: env('DB_PASS'),
