@@ -12,28 +12,21 @@ module.exports = {
         type: Sequelize.STRING(30),
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING(50),
-        unique: true,
-        allowNull: false,
+      deskripsi: {
+        type: Sequelize.STRING(255),
       },
-      password: {
+      url: {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      saldo: {
+      waktu: {
+        type: Sequelize.DATETIME,
+        allowNull: false,
+      },
+      user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0,
-      },
-      tier_id:{
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: 'tiers', key: 'id' },
-      },
-      status:{
-        type: Sequelize.ENUM('ACTIVE', 'INACTIVE'),
-        defaultValue: 'ACTIVE',
+        references: { model: 'users', key: 'id' },
       },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
