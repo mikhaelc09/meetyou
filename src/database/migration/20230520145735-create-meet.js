@@ -20,7 +20,7 @@ module.exports = {
         allowNull: false,
       },
       waktu: {
-        type: Sequelize.DATETIME,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       user_id: {
