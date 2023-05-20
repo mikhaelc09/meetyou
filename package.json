@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/index.js",
+    "migrate": "npx sequelize-cli db:create && npx sequelize-cli db:migrate",
     "initdir": "npx mkdirp src/routes src/controllers src/models src/config src/middlewares src/validations src/utils src/database/migration src/database/seeder"
   },
   "keywords": [],
