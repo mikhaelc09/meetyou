@@ -1,5 +1,5 @@
-const env = require('./config/env.config');
-const routes = require('./routes/index');
+const env = require('../config/env.config.js');
+const routes = require('../routes/index.js');
 const Sequelize = require('sequelize');
 const Joi = require('joi');
 
@@ -16,6 +16,7 @@ const sequelize = new Sequelize(
 const User = sequelize.define('Users', {
   id: {
     type: Sequelize.INTEGER,
+    primaryKey: true,
     autoIncrement: true,
     allowNull: false,
   },
@@ -67,7 +68,6 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: error.details[0].message });
     }
     
-
     const { name, email, password } = req.body;
     const user = await User.create({
       name,
