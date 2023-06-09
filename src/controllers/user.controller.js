@@ -13,7 +13,7 @@ const sequelize = new Sequelize(
   }
 );
 
-const User = sequelize.define('Users', {
+const User = sequelize.define('users', {
   id: {
     type: Sequelize.INTEGER,
     primaryKey: true,
@@ -85,6 +85,35 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  });
+
+  try {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+    
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ error: 'Email not found' });
+    }
+    if (user.password !== password) {
+      return res.status(400).json({ error: 'Password incorrect' });
+    }
+
+    return res.status(200).json(user);
+  }
+  catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const changePassword = async (req, res) => {
+  
 };
 
 module.exports = {
