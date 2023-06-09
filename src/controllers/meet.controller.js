@@ -47,15 +47,28 @@ sequelize.sync();
 const getMeetUser = async (req, res) => {
   try {
     const meet = await Meet.findOne({ where: { user_id } });
-    if(!meet){
-        return res.status(400).json({ error: 'User not found' });
+    if (!meet) {
+      return res.status(400).json({ error: "User not found" });
     }
     return res.status(200).json(meet);
-} catch (error) {
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const getMeetById = async (req, res) => {
+  try {
+    const meet = await Meet.findOne({ where: { id } });
+    if (!meet) {
+      return res.status(400).json({ error: "User not found" });
+    }
+    return res.status(200).json(meet);
+  } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 module.exports = {
-    getMeetUser
+  getMeetUser,
+  getMeetById,
 };
