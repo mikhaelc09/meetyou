@@ -4,9 +4,11 @@ const Sequelize = require('sequelize');
 const Joi = require('joi');
 const db = require('../models/index.js');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
   registerUser: async (req, res) => {
+    //create schema
     const schema = Joi.object({
       name: Joi.string().required().messages({
         'any.required': 'name is required',
@@ -25,7 +27,8 @@ module.exports = {
     balance = 0;
     tier_id = 1;
     status = 'active';
-    
+
+    //start transaction
     const transaction = await db.sequelize.transaction();
     try {
       const { error } = schema.validate(req.body);
@@ -40,7 +43,7 @@ module.exports = {
       if (emailExists) {
         return res.status(400).json({ error: 'Email already exists' });
       }
-  
+
       //create new user
       const { name, email, password, zoom_key } = req.body;
       await db.User.create({
@@ -56,7 +59,7 @@ module.exports = {
 
       const user = await db.User.findOne({
         where: { email: email },
-        include: [ {model: db.Tier, as: "tier"} ]
+        include: [{ model: db.Tier, as: "tier" }]
       });
 
       //return user
@@ -78,31 +81,45 @@ module.exports = {
   },
 
   loginUser: async (req, res) => {
+    //create schema
     const schema = Joi.object({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(6).required(),
+      email: Joi.string().email().required().messages({
+        'any.required': 'email is required',
+        'string.email': 'email is invalid',
+      }),
+      password: Joi.string().min(6).required().messages({
+        'any.required': 'password is required',
+        'string.min': 'password must be at least 6 characters',
+      }),
     });
 
-    try {
-      const { error } = schema.validate(req.body);
-      if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-      }
-
-      const { email, password } = req.body;
-      const user = await User.findOne({ where: { email } });
-      if (!user) {
-        return res.status(400).json({ error: 'Email not found' });
-      }
-      if (user.password !== password) {
-        return res.status(400).json({ error: 'Password incorrect' });
-      }
-
-      return res.status(200).json(user);
+    //do login
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
     }
-    catch (error) {
-      return res.status(500).json({ error: error.message });
+
+    const { email, password } = req.body;
+    const user = await db.User.findOne({ where: { email: email } });
+    if (!user) {
+      return res.status(404).json({ error: 'User does not exists' });
     }
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(400).json({ error: 'Password incorrect' });
+    }
+
+    //generate token
+    const token = jwt.sign(
+      { email: user.email },
+      env("SECRET"),
+      { expiresIn: '24h' }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token: token,
+    });
   },
 };
 
