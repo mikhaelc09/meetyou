@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    nama: {
+    name: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
-    harga: {
+    price: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
