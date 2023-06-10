@@ -22,8 +22,9 @@ module.exports = {
         type: Sequelize.ENUM('PENDING', 'ACCEPTED', 'REJECTED'),
         defaultValue: 'PENDING',
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      created_at: Sequelize.DATE,
+      updated_at: Sequelize.DATE,
+      deleted_at: Sequelize.DATE,
     });
   },
   async down(queryInterface, Sequelize) {

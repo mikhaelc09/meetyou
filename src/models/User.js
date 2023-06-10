@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    nama: {
+    name: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
@@ -30,7 +30,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    saldo: {
+    zoom_key: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    balance: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
@@ -51,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     deletedAt: {
       allowNull: true,

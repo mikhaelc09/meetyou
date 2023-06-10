@@ -5,26 +5,26 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('tiers', [
       {
-        nama: 'Free',
-        harga: 0,
+        name: 'Free',
+        price: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nama: 'Personal',
-        harga: 10000,
+        name: 'Personal',
+        price: 10000,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nama: 'Business',
-        harga: 20000,
+        name: 'Business',
+        price: 20000,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nama: 'Enterprise',
-        harga: 30000,
+        name: 'Enterprise',
+        price: 30000,
         createdAt: new Date(),
         updatedAt: new Date(),
       }]);

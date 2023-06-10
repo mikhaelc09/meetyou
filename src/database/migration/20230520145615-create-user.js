@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      nama: {
+      name: {
         type: Sequelize.STRING(30),
         allowNull: false,
       },
@@ -21,7 +21,11 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      saldo: {
+      zoom_key: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      balance: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -35,8 +39,9 @@ module.exports = {
         type: Sequelize.ENUM('ACTIVE', 'INACTIVE'),
         defaultValue: 'ACTIVE',
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      created_at: Sequelize.DATE,
+      updated_at: Sequelize.DATE,
+      deleted_at: Sequelize.DATE,
     });
   },
   async down(queryInterface, Sequelize) {

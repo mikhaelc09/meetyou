@@ -8,16 +8,17 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      nama: {
+      name: {
         type: Sequelize.STRING(30),
         allowNull: false,
       },
-      harga: {
+      price: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      created_at: Sequelize.DATE,
+      updated_at: Sequelize.DATE,
+      deleted_at: Sequelize.DATE,
     });
   },
   async down(queryInterface, Sequelize) {

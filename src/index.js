@@ -3,6 +3,8 @@ const env = require('./config/env.config')
 const routes = require('./routes/index')
 const app = express()
 const port = env('PORT')
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.use('/v1',routes)
 app.get('/', (req, res) => res.send('Hello World!'))

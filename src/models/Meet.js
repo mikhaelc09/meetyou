@@ -21,19 +21,19 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    nama: {
+    name: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
-    deskripsi: {
+    agenda: {
       type: DataTypes.STRING(255),
     },
     url: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    waktu: {
-      type: DataTypes.DATETIME,
+    time: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
     user_id: {

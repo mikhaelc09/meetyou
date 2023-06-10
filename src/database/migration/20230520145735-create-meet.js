@@ -12,14 +12,14 @@ module.exports = {
         type: Sequelize.STRING(30),
         allowNull: false,
       },
-      deskripsi: {
+      agenda: {
         type: Sequelize.STRING(255),
       },
       url: {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      waktu: {
+      time: {
         type: Sequelize.DATE,
         allowNull: false,
       },
@@ -28,8 +28,9 @@ module.exports = {
         allowNull: false,
         references: { model: 'users', key: 'id' },
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      created_at: Sequelize.DATE,
+      updated_at: Sequelize.DATE,
+      deleted_at: Sequelize.DATE,
     });
   },
   async down(queryInterface, Sequelize) {

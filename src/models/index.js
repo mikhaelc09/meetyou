@@ -5,16 +5,15 @@ const config = dbconfig['development'];
 const db = {};
 let sequelize = new Sequelize(config.database, config.username, config.password, config);
 
-
 const Invite = require('./Invite.js');
 const Meet = require('./Meet.js');
 const Tier = require('./Tier.js');
 const User = require('./User.js');
 
-db.Invite = Invite;
-db.Meet = Meet;
-db.Tier = Tier;
-db.User = User;
+db.Invite = Invite(sequelize, Sequelize);
+db.Meet = Meet(sequelize, Sequelize);
+db.Tier = Tier(sequelize, Sequelize);
+db.User = User(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
