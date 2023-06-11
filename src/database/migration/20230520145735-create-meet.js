@@ -8,8 +8,8 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      nama: {
-        type: Sequelize.STRING(30),
+      topic: {
+        type: Sequelize.STRING(50),
         allowNull: false,
       },
       agenda: {
@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      time: {
+      start_time: {
         type: Sequelize.DATE,
         allowNull: false,
       },

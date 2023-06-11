@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
-      type: DataTypes.STRING(30),
+    topic: {
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     agenda: {
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    time: {
+    start_time: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     deletedAt: {
       allowNull: true,
