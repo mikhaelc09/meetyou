@@ -6,12 +6,84 @@ const axios = require("axios");
 const db = require("../models/index.js");
 
 module.exports = {
+  inviteMeet: async (req, res) => {
+    //chreate shcema
+    const schema = Joi.object({
+      email: Joi.array().items(Joi.string().email()).required().messages({
+        "any.required": "email is required",
+        "string.email": "email must be in email format",
+      }),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    //check if meeting exist
+    const thisUser = await db.User.findOne({
+      where: { email: req.user.email },
+    });
+
+    const meet = await db.Meet.findOne({
+      where: { id: req.params.id, user_id: thisUser.id },
+    });
+
+    if (!meet) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    const emails = req.body.email;
+    //start transaction
+    const transaction = await db.sequelize.transaction();
+    try {
+      let success = [];
+      let failed = [];
+      for (const email of emails) {
+        const user = await db.User.findOne({
+          where: { email: email },
+        });
+
+        if (!user || user.status == "INACTIVE" || email == req.user.email) {
+          failed.push(email);
+        } else {
+          const invite = await db.Invite.findOne({
+            where: { user_id: user.id, meet_id: req.params.id },
+          });
+
+          if (!invite) {
+            await db.Invite.create({
+              meet_id: req.params.id,
+              user_id: user.id,
+              status: "PENDING",
+            }, { transaction: transaction });
+          }
+
+          success.push(email);
+        }
+      }
+
+      transaction.commit();
+      return res.status(200).json({
+        message: `${success.length} email(s) successfully invited, ${failed.length} email(s) failed to invite`,
+        success: success,
+        failed: failed,
+      });
+    } catch (error) {
+      transaction.rollback();
+      return res.status(500).json({ error: error.message });
+    }
+  },
+
   getInvite: async (req, res) => {
     //create schema
     const schema = Joi.object({
-      target: Joi.string().valid("ME", "SENT").required().messages({
+      target: Joi.string().valid("me", "sent").required().messages({
         "any.required": "target is required",
         "string.valid": "target must be ME or SENT",
+      }),
+      status: Joi.string().valid("pending", "accepted", "rejected").optional().messages({
+        "string.valid": "status must be pending, accepted, or rejected",
       }),
     });
 
@@ -23,15 +95,14 @@ module.exports = {
     const user = await db.User.findOne({
       where: { email: req.user.email },
     });
-
-    if (req.query.target == "ME") {
+    if (req.query.target == "me") {
       const invite = await db.Invite.findAll({
-        where: { user_id: user.id },
+        where: { user_id: user.id, status: {[db.Sequelize.Op.like]: `%${req.query.status??""}%`} },
         attributes: ["id", "status"],
         include: [{
           model: db.Meet,
           as: "meet",
-          attributes: ["id","topic", "agenda", "url", "start_time"],
+          attributes: ["id","topic", "start_time"],
         }],
       });
       return res.status(200).json({ data: invite });
@@ -41,7 +112,7 @@ module.exports = {
         include: [{
           model: db.Meet,
           as: "meet",
-          attributes: ["id","topic", "agenda", "url", "start_time"],
+          attributes: ["id","topic", "start_time"],
           where: { user_id: user.id },
         },
         {
@@ -52,6 +123,87 @@ module.exports = {
       });
 
       return res.status(200).json({ data: invite });
+    }
+  },
+
+  getInviteById: async (req, res) => {
+    const invite = await db.Invite.findOne({
+      where: { id: req.params.id },
+      attributes: ["id", "status", "user_id"],
+      include: {
+        model: db.Meet,
+        as: "meet",
+        attributes: ["id","topic", "agenda", "url", "start_time"],
+      },
+    });
+
+    if (!invite) {
+      return res.status(404).json({ error: "Invite not found" });
+    }
+
+    const user = await db.User.findOne({
+      where: { email: req.user.email },
+    });
+
+    if(invite.user_id != user.id){
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    return res.status(200).json({ 
+      data: {
+        id: invite.id,
+        status: invite.status,
+        meet: invite.meet,
+      }
+    });
+  },
+
+  responseInvite: async (req, res) => {
+    //create schema
+    const schema = Joi.object({
+      action: Joi.string().valid("accept", "reject").required().messages({
+        "any.required": "action is required",
+        "string.valid": "action must be accept or reject",
+      }),
+    });
+
+    const { error } = schema.validate(req.query);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const invite = await db.Invite.findOne({
+      where: { id: req.params.id },
+      attributes: ["id", "status", "user_id"],
+      include: {
+        model: db.Meet,
+        as: "meet",
+        attributes: ["id","topic", "agenda", "url", "start_time"],
+      },
+    });
+
+    if (!invite) {
+      return res.status(404).json({ error: "Invite not found" });
+    }
+
+    const user = await db.User.findOne({
+      where: { email: req.user.email },
+    });
+
+    if(invite.user_id != user.id){
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if(invite.status != "PENDING"){
+      return res.status(400).json({ error: `Invite already ${invite.status}` });
+    }
+
+    if(req.query.action == "accept"){
+      await db.Invite.update({ status: "ACCEPTED" }, { where: { id: req.params.id } });
+      return res.status(200).json({ message: "Invite accepted" });
+    }else{
+      await db.Invite.update({ status: "REJECTED" }, { where: { id: req.params.id } });
+      return res.status(200).json({ message: "Invite rejected" });
     }
   },
 
@@ -174,75 +326,6 @@ module.exports = {
 
       return res.status(200).json(meets);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  },
-
-  inviteMeet: async (req, res) => {
-    //chreate shcema
-    const schema = Joi.object({
-      email: Joi.array().items(Joi.string().email()).required().messages({
-        "any.required": "email is required",
-        "string.email": "email must be in email format",
-      }),
-    });
-
-    const { error } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
-
-    //check if meeting exist
-    const thisUser = await db.User.findOne({
-      where: { email: req.user.email },
-    });
-
-    const meet = await db.Meet.findOne({
-      where: { id: req.params.id, user_id: thisUser.id },
-    });
-
-    if (!meet) {
-      return res.status(404).json({ error: "Meeting not found" });
-    }
-
-    const emails = req.body.email;
-    //start transaction
-    const transaction = await db.sequelize.transaction();
-    try {
-      let success = [];
-      let failed = [];
-      for (const email of emails) {
-        const user = await db.User.findOne({
-          where: { email: email },
-        });
-
-        if (!user || user.status == "INACTIVE" || email == req.user.email) {
-          failed.push(email);
-        } else {
-          const invite = await db.Invite.findOne({
-            where: { user_id: user.id, meet_id: req.params.id },
-          });
-
-          if (!invite) {
-            await db.Invite.create({
-              meet_id: req.params.id,
-              user_id: user.id,
-              status: "PENDING",
-            }, { transaction: transaction });
-          }
-
-          success.push(email);
-        }
-      }
-
-      transaction.commit();
-      return res.status(200).json({
-        message: `${success.length} email(s) successfully invited, ${failed.length} email(s) failed to invite`,
-        success: success,
-        failed: failed,
-      });
-    } catch (error) {
-      transaction.rollback();
       return res.status(500).json({ error: error.message });
     }
   },
