@@ -6,6 +6,55 @@ const axios = require("axios");
 const db = require("../models/index.js");
 
 module.exports = {
+  getInvite: async (req, res) => {
+    //create schema
+    const schema = Joi.object({
+      target: Joi.string().valid("ME", "SENT").required().messages({
+        "any.required": "target is required",
+        "string.valid": "target must be ME or SENT",
+      }),
+    });
+
+    const { error } = schema.validate(req.query);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const user = await db.User.findOne({
+      where: { email: req.user.email },
+    });
+
+    if (req.query.target == "ME") {
+      const invite = await db.Invite.findAll({
+        where: { user_id: user.id },
+        attributes: ["id", "status"],
+        include: [{
+          model: db.Meet,
+          as: "meet",
+          attributes: ["id","topic", "agenda", "url", "start_time"],
+        }],
+      });
+      return res.status(200).json({ data: invite });
+    } else {
+      const invite = await db.Invite.findAll({
+        attributes: ["id", "status"],
+        include: [{
+          model: db.Meet,
+          as: "meet",
+          attributes: ["id","topic", "agenda", "url", "start_time"],
+          where: { user_id: user.id },
+        },
+        {
+          model: db.User,
+          as: "user",
+          attributes: ["name", "email"],
+        }]
+      });
+
+      return res.status(200).json({ data: invite });
+    }
+  },
+
   createMeet: async (req, res) => {
     //chreate shcema
     const schema = Joi.object({
@@ -64,6 +113,11 @@ module.exports = {
         start_time: start_time,
         user_id: user.id,
       }, { transaction: transaction });
+
+      db.History.create({
+        user_id: user.id,
+        action: `Make Meeting ${req.body.topic}`
+      })
       transaction.commit();
 
       return res.status(201).json({
@@ -74,7 +128,7 @@ module.exports = {
           timezone: "ID",
           password: password ?? "123456",
           agenda: agenda ?? "",
-          join_url: join_url,
+          join_url: "join_url",
         }
       });
     }
@@ -95,7 +149,7 @@ module.exports = {
 
       const meets = await db.Meet.findAll({
         where: { user_id: user.id },
-        attributes : ['id', 'topic', 'agenda', 'url', 'start_time']
+        attributes: ['id', 'topic', 'agenda', 'url', 'start_time']
       });
       return res.status(200).json(meets);
     } catch (error) {
@@ -111,13 +165,13 @@ module.exports = {
 
       const meets = await db.Meet.findOne({
         where: { user_id: user.id, id: req.params.id },
-        attributes : ['id', 'topic', 'agenda', 'url', 'start_time']
+        attributes: ['id', 'topic', 'agenda', 'url', 'start_time']
       });
 
       if (!meets) {
         return res.status(404).json({ error: "Meeting not found" });
       }
-      
+
       return res.status(200).json(meets);
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -164,7 +218,7 @@ module.exports = {
 
         if (!user || user.status == "INACTIVE" || email == req.user.email) {
           failed.push(email);
-        }else {
+        } else {
           const invite = await db.Invite.findOne({
             where: { user_id: user.id, meet_id: req.params.id },
           });
@@ -182,16 +236,16 @@ module.exports = {
       }
 
       transaction.commit();
-        return res.status(200).json({
-          message: `${success.length} email(s) successfully invited, ${failed.length} email(s) failed to invite}`,
-          success: success,
-          failed: failed,
-        });
+      return res.status(200).json({
+        message: `${success.length} email(s) successfully invited, ${failed.length} email(s) failed to invite`,
+        success: success,
+        failed: failed,
+      });
     } catch (error) {
       transaction.rollback();
       return res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
 
 

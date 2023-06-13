@@ -3,29 +3,25 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Tier extends Model {
+  class History extends Model {
     static associate(models) {
-      Tier.hasMany(models.User, {
+      History.hasMany(models.User, {
         foreignKey: 'tier_id',
         as: 'users',
       });
     }
   }
-  Tier.init({
+  History.init({
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
-      type: DataTypes.STRING(30),
+    action: {
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    limit: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -45,11 +41,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'Tier',
-    tableName: 'tiers',
+    modelName: 'History',
+    tableName: 'histories',
     timestamps: true,
     paranoid: true,
     underscored: true,
   });
-  return Tier;
+  return History;
 };

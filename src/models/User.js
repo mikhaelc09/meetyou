@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'tier_id',
         as: 'tier',
       });
+      User.hasMany(models.Meet, {
+        foreignKey: 'user_id',
+        as: 'meet',
+      });
+      User.hasMany(models.Invite, {
+        foreignKey: 'user_id',
+        as: 'invite',
+      });
     }
   }
   User.init({

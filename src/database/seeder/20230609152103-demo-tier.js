@@ -7,24 +7,28 @@ module.exports = {
       {
         name: 'Free',
         price: 0,
+        limit: 5,
         created_at: new Date(),
         updated_at: new Date(),
       },
       {
         name: 'Personal',
         price: 10000,
+        limit: 15,
         created_at: new Date(),
         updated_at: new Date(),
       },
       {
         name: 'Business',
         price: 20000,
+        limit: 25,
         created_at: new Date(),
         updated_at: new Date(),
       },
       {
         name: 'Enterprise',
-        price: 30000,
+        price: 40000,
+        limit: 50,
         created_at: new Date(),
         updated_at: new Date(),
       }]);

@@ -27,6 +27,8 @@ module.exports = {
         }
         return res.status(401).json({ error: "Invalid Zoom Key, Please Update Your Zoom Key Using [PUT] /auth/zoom or follow this tutorial: " });
     },
+
+    
 }
 
 
