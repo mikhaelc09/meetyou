@@ -10,6 +10,7 @@ router.get('/invite/:id', auth.authToken, meetController.getInviteById)
 router.put('/invite/:id', auth.authToken, meetController.responseInvite)
 router.post('/', auth.authToken, auth.checkZoomKey, hit.checkLimit, meetController.createMeet)
 router.get('/', auth.authToken, meetController.getMeet)
+router.get(`/history`, auth.authToken, meetController.getHistoryMeet)
 router.get('/:id', auth.authToken, meetController.getMeetById)
 
 module.exports = router

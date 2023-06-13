@@ -329,6 +329,27 @@ module.exports = {
       return res.status(500).json({ error: error.message });
     }
   },
+
+  getHistoryMeet: async (req, res) => {
+    try{
+      const user = await db.User.findOne({
+        where: { email: req.user.email },
+      });
+
+      const history = await db.History.findAll({
+        where: { user_id: user.id },
+        attributes: ['id', 'action', 'createdAt']
+      });
+
+      if(history.length == 0){
+        return res.status(404).json({error:"User doesn't have meeting history"});
+      }
+
+      return res.status(200).json(history);
+    }catch(error){
+      return res.status(500).json({ error: error.message });
+    }
+  },
 };
 
 
