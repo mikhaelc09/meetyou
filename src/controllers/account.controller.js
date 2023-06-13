@@ -109,6 +109,32 @@ module.exports = {
       transaction.rollback();
       return res.status(500).json({ error: error.message });
     }
+  },
+
+  getProfile: async (req, res) => {
+    try{
+      const user = await db.User.findOne({
+        where: { email: req.user.email },
+        include: [{ model: db.Tier, as: "tier" }]
+      });
+
+      if (!user || user.status == 'INACTIVE') {
+        return res.status(404).json({ error: 'User does not exists' });
+      }
+
+      return res.status(200).json({
+        user: {
+          name: user.name,
+          email: user.email,
+          zoom_key: user.zoom_key,
+          balance: "Rp. "+ user.balance,
+          tier: user.tier.name,
+          status: user.status,
+        },
+      });
+    }catch(error){
+      return res.status(500).json({ error: error.message });
+    }
   }
 };
 
