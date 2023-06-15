@@ -97,12 +97,12 @@ module.exports = {
     });
     if (req.query.target == "me") {
       const invite = await db.Invite.findAll({
-        where: { user_id: user.id, status: {[db.Sequelize.Op.like]: `%${req.query.status??""}%`} },
+        where: { user_id: user.id, status: { [db.Sequelize.Op.like]: `%${req.query.status ?? ""}%` } },
         attributes: ["id", "status"],
         include: [{
           model: db.Meet,
           as: "meet",
-          attributes: ["id","topic", "start_time"],
+          attributes: ["id", "topic", "start_time"],
         }],
       });
       return res.status(200).json({ data: invite });
@@ -112,7 +112,7 @@ module.exports = {
         include: [{
           model: db.Meet,
           as: "meet",
-          attributes: ["id","topic", "start_time"],
+          attributes: ["id", "topic", "start_time"],
           where: { user_id: user.id },
         },
         {
@@ -133,7 +133,7 @@ module.exports = {
       include: {
         model: db.Meet,
         as: "meet",
-        attributes: ["id","topic", "agenda", "url", "start_time"],
+        attributes: ["id", "topic", "agenda", "url", "start_time"],
       },
     });
 
@@ -145,11 +145,11 @@ module.exports = {
       where: { email: req.user.email },
     });
 
-    if(invite.user_id != user.id){
+    if (invite.user_id != user.id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       data: {
         id: invite.id,
         status: invite.status,
@@ -178,7 +178,7 @@ module.exports = {
       include: {
         model: db.Meet,
         as: "meet",
-        attributes: ["id","topic", "agenda", "url", "start_time"],
+        attributes: ["id", "topic", "agenda", "url", "start_time"],
       },
     });
 
@@ -190,18 +190,18 @@ module.exports = {
       where: { email: req.user.email },
     });
 
-    if(invite.user_id != user.id){
+    if (invite.user_id != user.id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    if(invite.status != "PENDING"){
+    if (invite.status != "PENDING") {
       return res.status(400).json({ error: `Invite already ${invite.status}` });
     }
 
-    if(req.query.action == "accept"){
+    if (req.query.action == "accept") {
       await db.Invite.update({ status: "ACCEPTED" }, { where: { id: req.params.id } });
       return res.status(200).json({ message: "Invite accepted" });
-    }else{
+    } else {
       await db.Invite.update({ status: "REJECTED" }, { where: { id: req.params.id } });
       return res.status(200).json({ message: "Invite rejected" });
     }
@@ -246,6 +246,7 @@ module.exports = {
         Authorization: `Bearer ${user.zoom_key}`,
       },
     };
+    console.log(config);
 
     //start transaction
     const transaction = await db.sequelize.transaction();
@@ -287,7 +288,7 @@ module.exports = {
     catch (error) {
       transaction.rollback();
       if (error.message === "Request failed with status code 401") {
-        return res.status(401).json({ error: "Invalid Zoom Key" });
+        return res.status(401).json({ error: "Invalid Zoom Secret/ID or Expired Zoom Key, To fix this problem please use [PUT] /account/zoom to configure Zoom Secret/ID or [GET] /account/zoom to get Zoom Key" });
       }
       return res.status(500).json({ error: error.message });
     }

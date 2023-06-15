@@ -21,7 +21,8 @@ module.exports = {
         'any.required': 'password is required',
         'string.min': 'password must be at least 6 characters',
       }),
-      zoom_key: Joi.string().optional(),
+      zoom_id: Joi.string().optional(),
+      zoom_secret: Joi.string().optional(),
     });
 
     balance = 0;
@@ -45,12 +46,13 @@ module.exports = {
       }
 
       //create new user
-      const { name, email, password, zoom_key } = req.body;
+      const { name, email, password, zoom_id, zoom_secret } = req.body;
       await db.User.create({
         name: name,
         email: email,
         password: bcrypt.hashSync(password, 10),
-        zoom_key: zoom_key,
+        zoom_id: zoom_id,
+        zoom_secret: zoom_secret,
         balance: balance,
         tier_id: tier_id,
         status: status,
@@ -68,7 +70,8 @@ module.exports = {
         user: {
           name: user.name,
           email: user.email,
-          zoom_key: user.zoom_key,
+          zoom_id: zoom_id,
+          zoom_secret: zoom_secret,
           balance: user.balance,
           tier: user.tier.name,
           status: user.status,

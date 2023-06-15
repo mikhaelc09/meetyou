@@ -38,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    zoom_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    zoom_secret: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     zoom_key: {
       type: DataTypes.STRING(255),
       allowNull: true,

@@ -21,8 +21,16 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      zoom_key: {
+      zoom_id: {
         type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      zoom_secret: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      zoom_key: {
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       balance: {
