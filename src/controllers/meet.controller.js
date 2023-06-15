@@ -351,6 +351,40 @@ module.exports = {
       return res.status(500).json({ error: error.message });
     }
   },
+
+  deleteMeet: async (req, res) => {
+    try{
+      const { meetingId } = req.params;
+
+      const meeting = await db.Meet.findOne({ where: { id: meetingId } });
+
+      if (!meeting) {
+        return res.status(404).json({ error: "Meeting not found" });
+      }
+
+      const invites = await db.Invite.findAll({ where: { meet_id: meetingId } });
+
+      await Promise.all(invites.map((invite) => invite.destroy()));
+
+      await meeting.destroy();
+
+      const user = await db.User.findOne({ where: { email: req.user.email } });
+      
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.zoom_key}`,
+        },
+      };
+
+      // ntah kenapa pakek dibawah ini yang axios delete nya ke arah 404 tapi di db deleted_at nya ada
+      // await axios.delete(`https://api.zoom.us/v2/meetings/${meetingId}`, config);
+
+      return res.status(200).json({ message: "Meeting deleted successfully" });
+
+    } catch(error) {
+      return res.status(500).json({ error: error.message });
+    }
+  },
 };
 
 

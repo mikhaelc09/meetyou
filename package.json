@@ -28,5 +28,13 @@
     "@faker-js/faker": "^7.6.0",
     "mkdirp": "^3.0.1",
     "nodemon": "^2.0.22"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikhaelc09/meetyou.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mikhaelc09/meetyou/issues"
+  },
+  "homepage": "https://github.com/mikhaelc09/meetyou#readme"
 }
