@@ -281,7 +281,7 @@ module.exports = {
           timezone: "ID",
           password: password ?? "123456",
           agenda: agenda ?? "",
-          join_url: "join_url",
+          join_url: join_url,
         }
       });
     }
