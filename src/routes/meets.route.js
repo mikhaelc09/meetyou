@@ -13,6 +13,6 @@ router.post('/', auth.authToken, auth.checkZoomKey, hit.checkLimit, meetControll
 router.get('/', auth.authToken, meetController.getMeet)
 router.get(`/history`, auth.authToken, meetController.getHistoryMeet)
 router.get('/:id', auth.authToken, meetController.getMeetById)
-router.delete('/:meetingId', auth.authToken, meetController.deleteMeet);
+router.delete('/:id', auth.authToken, meetController.deleteMeet);
 
 module.exports = router

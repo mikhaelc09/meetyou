@@ -354,15 +354,15 @@ module.exports = {
 
   deleteMeet: async (req, res) => {
     try{
-      const { meetingId } = req.params;
+      const { id } = req.params;
 
-      const meeting = await db.Meet.findOne({ where: { id: meetingId } });
+      const meeting = await db.Meet.findOne({ where: { id: id } });
 
       if (!meeting) {
         return res.status(404).json({ error: "Meeting not found" });
       }
 
-      const invites = await db.Invite.findAll({ where: { meet_id: meetingId } });
+      const invites = await db.Invite.findAll({ where: { meet_id: id } });
 
       await Promise.all(invites.map((invite) => invite.destroy()));
 
