@@ -245,7 +245,7 @@ module.exports = {
   },
 
   getProfile: async (req, res) => {
-    try {
+    try{
       const user = await db.User.findOne({
         where: { email: req.user.email },
         include: [{ model: db.Tier, as: "tier" }]
