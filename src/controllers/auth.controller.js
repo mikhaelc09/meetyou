@@ -130,10 +130,15 @@ module.exports = {
   },
 
   oauth2: async (req, res) => {
-    const url = oauth2Client.generateAuthUrl({
+    let url = oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: scopes,
     });
+
+    const user = await db.User.findOne({
+      where: { email: req.user.email },
+    })
+    url+=`&state=${user.id}`
 
     return res.status(201).json({
       message: "Please login to your google account",
@@ -141,21 +146,10 @@ module.exports = {
     });
   },
   google: async (req, res) => {
-    const { code } = req.query;
-
-    return res.status(200).json({
-      message: "OK",
-      code,
-    });
-  },
-  oauth2callback: async (req, res) => {
-    const { code } = req.query;
+    const { code, state } = req.query;
     const user = await db.User.findOne({
-      where: { email: req.user.email },
-    });
-    if (!user) {
-      return res.status(404).json({ error: "User does not exists" });
-    }
+      where: { id: state },
+    })
     user.google_code = code;
     await user.save();
 
@@ -165,5 +159,5 @@ module.exports = {
       ...tokens,
       user: user.dataValues.email
     });
-  },
+  }
 };
