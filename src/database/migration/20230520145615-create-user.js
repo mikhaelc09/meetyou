@@ -33,6 +33,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      google_code:{
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
       balance: {
         type: Sequelize.INTEGER,
         allowNull: false,

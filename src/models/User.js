@@ -50,6 +50,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    google_code:{
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     balance: {
       type: DataTypes.INTEGER,
       allowNull: false,
