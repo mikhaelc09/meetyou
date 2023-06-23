@@ -77,11 +77,9 @@ module.exports = {
       summary: req.body.title,
       description: req.body.description,
       start: {
-        dateTime: req.body.start,
         timeZone: "Asia/Jakarta",
       },
       end: {
-        dateTime: req.body.end,
         timeZone: "Asia/Jakarta",
       },
       reminders: {
@@ -89,21 +87,32 @@ module.exports = {
         overrides: [{ method: "popup", minutes: 10 }],
       },
     };
-    if (meet) {
-      event.location = meet.url;
-    }
+    if (req.body.start.length == 10) event.start.date = req.body.start;
+    else event.start.dateTime = req.body.start;
+
+    if (req.body.end.length == 10) event.end.date = req.body.end;
+    else event.end.dateTime = req.body.end;
+
+    if (meet) event.location = meet.url;
+
     let createdEvent;
-    const result = await calendar.events.insert({
-      calendarId: "primary",
-      resource: event,
-    });
+    try {
+      var result = await calendar.events.insert({
+        calendarId: "primary",
+        resource: event,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
     createdEvent = {
       id: result.data.id,
       title: result.data.summary,
       location: result.data.location,
       status: result.data.status,
-      start: result.data.start.dateTime,
-      end: result.data.end.dateTime,
+      start: result.data.start.dateTime ?? result.data.start.date,
+      end: result.data.end.dateTime ?? result.data.end.date,
       description: result.data.description,
       link: result.data.htmlLink,
     };
@@ -155,14 +164,20 @@ module.exports = {
         timeZone: "Asia/Jakarta",
       },
     };
-    if(meet){
-      updatedEvent.location= meet.url
+    if (meet) {
+      updatedEvent.location = meet.url;
     }
-    const result = await calendar.events.update({
-      calendarId: "primary",
-      eventId: id,
-      requestBody: updatedEvent,
-    });
+    try {
+      var result = await calendar.events.update({
+        calendarId: "primary",
+        eventId: id,
+        requestBody: updatedEvent,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
     updatedEvent = {
       id: result.data.id,
       title: result.data.summary,
@@ -181,10 +196,19 @@ module.exports = {
   deleteCalendar: async (req, res) => {
     const id = req.params.id;
     const calendar = google.calendar({ version: "v3", auth: oauth2Client });
-    const findResult = await calendar.events.get({
-      calendarId: "primary",
-      eventId: id,
-    });
+
+    try {
+      var findResult = await calendar.events.get({
+        calendarId: "primary",
+        eventId: id,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
+
     let deletedEvent = {
       id: findResult.data.id,
       title: findResult.data.summary,
@@ -195,10 +219,17 @@ module.exports = {
       description: findResult.data.description,
       link: findResult.data.htmlLink,
     };
-    await calendar.events.delete({
-      calendarId: "primary",
-      eventId: id,
-    });
+
+    try {
+      await calendar.events.delete({
+        calendarId: "primary",
+        eventId: id,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
     return res.status(200).json({
       message: "OK",
       event: deletedEvent,
