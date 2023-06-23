@@ -1,6 +1,4 @@
 const env = require("../config/env.config.js");
-const routes = require("../routes/index.js");
-const Sequelize = require("sequelize");
 const Joi = require("joi");
 const db = require("../models/index.js");
 const bcrypt = require("bcrypt");
